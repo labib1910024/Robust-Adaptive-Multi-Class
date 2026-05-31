@@ -44,7 +44,6 @@ alpha = np.pi/2 + np.arctan(m)
 
 p = b / np.sqrt(1 + m**2)
 
-# Plot Representation Space
 
 plt.figure(figsize=(8,6))
 
@@ -62,7 +61,6 @@ plt.grid(True)
 
 plt.show()
 
-# Optional check
 
 print("Alpha Range:")
 print(alpha.min(), alpha.max())
@@ -74,7 +72,6 @@ print(p.min(), p.max())
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Assign trajectory classes
 
 classes = np.random.choice(
     [1,2,3],
@@ -120,7 +117,6 @@ plt.grid(True)
 
 plt.show()
 
-# Show class counts
 
 for k in [1,2,3]:
     print(
@@ -232,10 +228,6 @@ w3 = 3     # Illegal
 
 kappa = 1
 
-# -----------------------------------
-# Commercial Ship
-# -----------------------------------
-
 idx = classes == 1
 
 H1, _, _ = np.histogram2d(
@@ -248,9 +240,6 @@ mu1 = H1
 
 sigma1 = np.sqrt(H1 + 1)
 
-# -----------------------------------
-# Fishing Vessel
-# -----------------------------------
 
 idx = classes == 2
 
@@ -264,9 +253,6 @@ mu2 = H2
 
 sigma2 = np.sqrt(H2 + 1)
 
-# -----------------------------------
-# Illegal Vessel
-# -----------------------------------
 
 idx = classes == 3
 
@@ -280,10 +266,6 @@ mu3 = H3
 
 sigma3 = np.sqrt(H3 + 1)
 
-# -----------------------------------
-# Robust Multi-Class Intensity
-# -----------------------------------
-
 mu_total = mu1 + mu2 + mu3
 
 Lambda_RM = (
@@ -296,9 +278,6 @@ Lambda_RM = (
     )
 )
 
-# -----------------------------------
-# Plot
-# -----------------------------------
 
 plt.figure(figsize=(8,6))
 
@@ -321,7 +300,6 @@ plt.ylabel('Distance (p)')
 
 plt.show()
 
-# Statistics
 
 print("Maximum ΛRM =", np.max(Lambda_RM))
 print("Minimum ΛRM =", np.min(Lambda_RM))
@@ -331,9 +309,6 @@ print("Mean ΛRM =", np.mean(Lambda_RM))
 import numpy as np
 import matplotlib.pyplot as plt
 
-# -----------------------------
-# Original intensity map
-# -----------------------------
 
 H_all, _, _ = np.histogram2d(
     alpha,
@@ -341,9 +316,6 @@ H_all, _, _ = np.histogram2d(
     bins=25
 )
 
-# -----------------------------
-# Select strongest cells
-# -----------------------------
 
 num_sensors = 10
 
@@ -364,9 +336,6 @@ for idx in flat_indices:
 
     sensor_y.append(y)
 
-# -----------------------------
-# Plot
-# -----------------------------
 
 plt.figure(figsize=(8,6))
 
@@ -407,9 +376,6 @@ print("Sensor Y:",sensor_y)
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ----------------------------------
-# Select strongest RMABC cells
-# ----------------------------------
 
 num_sensors = 10
 
@@ -429,9 +395,6 @@ for idx in flat_indices:
     sensor_x_rm.append(x)
     sensor_y_rm.append(y)
 
-# ----------------------------------
-# Plot
-# ----------------------------------
 
 plt.figure(figsize=(8,6))
 
@@ -473,15 +436,8 @@ print("RMABC Sensor Y:", sensor_y_rm)
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ------------------------------
-# Detection Radius
-# ------------------------------
 
 radius = 6
-
-# ------------------------------
-# Original Sensors
-# ------------------------------
 
 detected_original = 0
 
@@ -507,10 +463,6 @@ for i in range(len(alpha)):
 
             break
 
-# ------------------------------
-# RMABC Sensors
-# ------------------------------
-
 detected_rmabc = 0
 
 for i in range(len(alpha)):
@@ -535,10 +487,6 @@ for i in range(len(alpha)):
 
             break
 
-# ------------------------------
-# Detection Rates
-# ------------------------------
-
 rate_original = \
 detected_original/len(alpha)
 
@@ -555,9 +503,6 @@ print(
 rate_rmabc
 )
 
-# ------------------------------
-# Plot
-# ------------------------------
 
 plt.figure(figsize=(6,5))
 
@@ -585,9 +530,6 @@ print("RMABC Detection =", rate_rmabc)
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ------------------------
-# Original Void Probability
-# ------------------------
 
 miss_original = 1 - rate_original
 
@@ -595,9 +537,6 @@ void_original = np.exp(
     -miss_original
 )
 
-# ------------------------
-# RMABC Void Probability
-# ------------------------
 
 miss_rmabc = 1 - rate_rmabc
 
@@ -615,9 +554,6 @@ print(
     void_rmabc
 )
 
-# ------------------------
-# Plot
-# ------------------------
 
 plt.figure(figsize=(6,5))
 
@@ -641,10 +577,6 @@ plt.show()
 import numpy as np
 import matplotlib.pyplot as plt
 
-# -------------------------
-# Parameters
-# -------------------------
-
 eta = 0.05
 iterations = 50
 
@@ -660,9 +592,6 @@ Lambda_RM_smooth = gaussian_filter(
     sigma=1.5
 )
 
-# -------------------------
-# Objective Function
-# -------------------------
 
 def objective(sx, sy):
 
@@ -677,9 +606,6 @@ def objective(sx, sy):
 
     return score
 
-# -------------------------
-# GBAC Optimization
-# -------------------------
 
 for step in range(iterations):
 
@@ -697,7 +623,6 @@ for step in range(iterations):
 
     for i in range(len(sensor_x)):
 
-        # x gradient
 
         plus = sensor_x.copy()
         minus = sensor_x.copy()
@@ -711,8 +636,6 @@ for step in range(iterations):
             objective(minus,sensor_y)
         )/(2*eps)
 
-        # y gradient
-
         plus = sensor_y.copy()
         minus = sensor_y.copy()
 
@@ -725,12 +648,11 @@ for step in range(iterations):
             objective(sensor_x,minus)
         )/(2*eps)
 
-    # update sensors
+
 
     sensor_x += eta*grad_x
     sensor_y += eta*grad_y
 
-    # keep inside map
 
     sensor_x = np.clip(
         sensor_x,
@@ -744,9 +666,6 @@ for step in range(iterations):
         24
     )
 
-# -------------------------
-# Final Sensor Placement
-# -------------------------
 
 plt.figure(figsize=(8,6))
 
@@ -773,10 +692,6 @@ plt.title(
 plt.legend()
 
 plt.show()
-
-# -------------------------
-# Convergence Curve
-# -------------------------
 
 plt.figure(figsize=(8,5))
 
