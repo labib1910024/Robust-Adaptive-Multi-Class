@@ -37,4 +37,54 @@ plt.show()
 <img width="707" height="547" alt="image" src="https://github.com/user-attachments/assets/e3821c56-f157-4012-bf82-b1fe039fad13" />
 
 **Figure 1:** Synthetic AIS Trajectories showing randomly generated vessel paths crossing the monitoring area.
+
+
+# STEP 2: Trajectory Representation Space Transformation
+
+## Description
+This step transforms each trajectory from the Cartesian space \((x,y)\) into the representation space \((\alpha,p)\). Here, \(\alpha\) represents the trajectory orientation, while \(p\) represents the shortest distance from the origin. This transformation converts line trajectories into points, enabling efficient LGCLP modeling and optimization.
+
+## Input Code
+```python
+# STEP 2: Trajectory Representation Space Transformation
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Transformation
+
+alpha = np.pi/2 + np.arctan(m)
+
+p = b / np.sqrt(1 + m**2)
+
+# Plot Representation Space
+
+plt.figure(figsize=(8,6))
+
+plt.scatter(
+    alpha,
+    p,
+    s=25,
+    color='blue'
+)
+
+plt.title("Trajectory Representation Space")
+plt.xlabel("Alpha (α)")
+plt.ylabel("Distance (p)")
+plt.grid(True)
+
+plt.show()
+
+# Optional check
+
+print("Alpha Range:")
+print(alpha.min(), alpha.max())
+
+print("\nP Range:")
+print(p.min(), p.max())
+```
+
+## Output
+<img width="698" height="547" alt="image" src="https://github.com/user-attachments/assets/e69f8f56-63be-4c6d-86f4-cee23e30e680" />
+
+**Figure 2:** Trajectory Representation Space showing each vessel trajectory as a point in the \((\alpha,p)\) domain.
 ```
