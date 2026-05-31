@@ -166,3 +166,236 @@ for k in [1,2,3]:
 
 
 **Figure 3:** Multi-Class Trajectory Representation showing the transformed trajectories in the representation space \((\alpha,p)\) categorized into Commercial Ships, Fishing Vessels, and Illegal Vessels.
+
+
+# STEP 4: Multi-Class LGCLP Intensity Estimation
+
+## Description
+
+This step estimates the class-specific trajectory intensity maps in the representation space \((\alpha,p)\). For each target class, a two-dimensional histogram is constructed to approximate the LGCLP mean intensity \(\mu_k(l)\), representing the spatial distribution of stochastic target trajectories.
+
+## Input Code
+
+```python
+# STEP 4: Multi-Class LGCLP Intensity Estimation
+import numpy as np
+import matplotlib.pyplot as plt
+
+bins = 25
+
+fig, ax = plt.subplots(
+    1,
+    3,
+    figsize=(15,4)
+)
+
+titles = [
+    "Commercial Ship μ₁",
+    "Fishing Vessel μ₂",
+    "Illegal Vessel μ₃"
+]
+
+for k in [1,2,3]:
+
+    idx = classes == k
+
+    H, xedges, yedges = np.histogram2d(
+        alpha[idx],
+        p[idx],
+        bins=bins
+    )
+
+    ax[k-1].imshow(
+        H.T,
+        origin='lower',
+        aspect='auto'
+    )
+
+    ax[k-1].set_title(
+        titles[k-1]
+    )
+
+plt.tight_layout()
+plt.show()
+```
+
+### Estimated Intensities
+
+- \(\mu_1(l)\): Commercial Ship Intensity
+- \(\mu_2(l)\): Fishing Vessel Intensity
+- \(\mu_3(l)\): Illegal Vessel Intensity
+
+## Output
+<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/335079bb-6e9d-4608-9259-a5d39f5810ba" />
+<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/dfdc8f67-58df-4193-ab5e-d0279e62d689" />
+<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/aba62f03-230f-4931-bb04-852c1473bf5f" />
+
+
+
+**Figure 4:** Multi-Class LGCLP Mean Intensity Maps showing the estimated trajectory intensity distributions for Commercial Ships, Fishing Vessels, and Illegal Vessels in the representation space.
+
+# STEP 5: Intensity Uncertainty Estimation
+
+## Description
+
+This step estimates the uncertainty associated with each class-specific LGCLP intensity map. The uncertainty is represented by the standard deviation \(\sigma_k(l)\), which measures the variability of target trajectory intensity within the representation space. These uncertainty maps are later incorporated into the robust intensity formulation to improve sensor placement under intensity estimation uncertainty.
+
+## Input Code
+
+```python
+sigma = np.sqrt(H + 1)
+```
+
+### Estimated Uncertainty Maps
+
+- \(\sigma_1(l)\): Commercial Ship Uncertainty
+- \(\sigma_2(l)\): Fishing Vessel Uncertainty
+- \(\sigma_3(l)\): Illegal Vessel Uncertainty
+
+## Output
+
+<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/f710e4ea-78fd-41aa-9b19-df702882a695" />
+<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/75ad42c5-5b42-4e23-a462-98ca64ca69fd" />
+<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/e18db0ad-0f32-49b0-a6d0-f6176f94cd8d" />
+
+
+**Figure 5:** Multi-Class Intensity Uncertainty Maps showing the uncertainty distribution for Commercial Ships, Fishing Vessels, and Illegal Vessels in the representation space \((\alpha,p)\).
+
+
+# STEP 6: Robust Multi-Class Intensity Construction
+
+## Description
+
+This step combines the class-specific mean intensity maps and uncertainty maps to construct the Robust Multi-Class Intensity \(\Lambda_{RM}(l)\). Different target classes are assigned different importance weights, while the uncertainty term improves robustness against intensity estimation errors. The resulting intensity map highlights high-priority and high-uncertainty regions for sensor placement optimization.
+
+## Input Code
+
+```python
+# STEP 6: Robust Multi-Class Intensity Construction
+import numpy as np
+import matplotlib.pyplot as plt
+
+bins = 25
+
+# class weights
+
+w1 = 1      # Commercial
+w2 = 2     # Fishing
+w3 = 3     # Illegal
+
+kappa = 1
+
+
+
+idx = classes == 1
+
+H1, _, _ = np.histogram2d(
+    alpha[idx],
+    p[idx],
+    bins=bins
+)
+
+mu1 = H1
+
+sigma1 = np.sqrt(H1 + 1)
+
+
+idx = classes == 2
+
+H2, _, _ = np.histogram2d(
+    alpha[idx],
+    p[idx],
+    bins=bins
+)
+
+mu2 = H2
+
+sigma2 = np.sqrt(H2 + 1)
+
+idx = classes == 3
+
+H3, _, _ = np.histogram2d(
+    alpha[idx],
+    p[idx],
+    bins=bins
+)
+
+mu3 = H3
+
+sigma3 = np.sqrt(H3 + 1)
+
+
+mu_total = mu1 + mu2 + mu3
+
+Lambda_RM = (
+    0.6 * mu_total
+    +
+    0.4 * (
+        w1*(mu1 + kappa*sigma1)
+        + w2*(mu2 + kappa*sigma2)
+        + w3*(mu3 + kappa*sigma3)
+    )
+)
+
+
+plt.figure(figsize=(8,6))
+
+plt.imshow(
+    Lambda_RM.T,
+    origin='lower',
+    aspect='auto'
+)
+
+plt.colorbar(
+    label='ΛRM'
+)
+
+plt.title(
+    'Robust Multi-Class Intensity Map'
+)
+
+plt.xlabel('Alpha (α)')
+plt.ylabel('Distance (p)')
+
+plt.show()
+
+
+print("Maximum ΛRM =", np.max(Lambda_RM))
+print("Minimum ΛRM =", np.min(Lambda_RM))
+print("Mean ΛRM =", np.mean(Lambda_RM))
+```
+
+### Parameters
+
+- \(w_1 = 1\): Commercial Ship Weight
+- \(w_2 = 2\): Fishing Vessel Weight
+- \(w_3 = 3\): Illegal Vessel Weight
+- \(\kappa = 1\): Robustness Coefficient
+
+### Robust Intensity Formulation
+
+\[
+\Lambda_{RM}(l)
+=
+\sum_{k=1}^{K}
+w_k
+\left(
+\mu_k(l)
++
+\kappa \sigma_k(l)
+\right)
+\]
+
+## Output
+<img width="655" height="547" alt="image" src="https://github.com/user-attachments/assets/dca159fd-cefe-4da6-8dea-423165d49266" />
+
+**Figure 6:** Robust Multi-Class Intensity Map showing the combined effect of target priority, trajectory density, and intensity uncertainty in the representation space.
+
+**Statistics:**
+
+- Maximum \(\Lambda_{RM}\)
+- Minimum \(\Lambda_{RM}\)
+- Mean \(\Lambda_{RM}\)
+
+These values provide an overall summary of the robust trajectory intensity distribution used for adaptive sensor placement optimization.
+
