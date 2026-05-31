@@ -35,5 +35,6 @@ plt.show()
 
 ## Output
 <img width="707" height="547" alt="image" src="https://github.com/user-attachments/assets/e3821c56-f157-4012-bf82-b1fe039fad13" />
+
 **Figure 1:** Synthetic AIS Trajectories showing randomly generated vessel paths crossing the monitoring area.
 ```
