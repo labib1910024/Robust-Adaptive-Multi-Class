@@ -227,9 +227,6 @@ plt.show()
 
 ## Output
 <img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/335079bb-6e9d-4608-9259-a5d39f5810ba" />
-<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/dfdc8f67-58df-4193-ab5e-d0279e62d689" />
-<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/aba62f03-230f-4931-bb04-852c1473bf5f" />
-
 
 
 **Figure 4:** Multi-Class LGCLP Mean Intensity Maps showing the estimated trajectory intensity distributions for Commercial Ships, Fishing Vessels, and Illegal Vessels in the representation space.
@@ -255,9 +252,6 @@ sigma = np.sqrt(H + 1)
 ## Output
 
 <img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/f710e4ea-78fd-41aa-9b19-df702882a695" />
-<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/75ad42c5-5b42-4e23-a462-98ca64ca69fd" />
-<img width="1489" height="390" alt="image" src="https://github.com/user-attachments/assets/e18db0ad-0f32-49b0-a6d0-f6176f94cd8d" />
-
 
 **Figure 5:** Multi-Class Intensity Uncertainty Maps showing the uncertainty distribution for Commercial Ships, Fishing Vessels, and Illegal Vessels in the representation space \((\alpha,p)\).
 
